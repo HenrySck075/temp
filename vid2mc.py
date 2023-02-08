@@ -37,6 +37,7 @@ def fill_scale(array,pos,color):
     xoff,yoff=1,0
     skippo=[]
     for h in range(pos[1],maxHeight):
+        if array[pos[0]+1][h+yoff]!=color and xoff==1: break
         if array[pos[0]][h+yoff]==color:
             xoff=0
             for w in range(pos[0],maxWidth):
@@ -58,7 +59,7 @@ print('Read file: {}'.format(videoFile))
 cap = cv2.VideoCapture(videoFile) # says we capture an image from a webcam
 width  = math.floor(cap.get(3))
 height = math.floor(cap.get(4))
-blocks=['white_wool,black_wool']
+blocks=['white_wool','gray_wool','black_wool']
 last_pxArray=[]
 while(cap.isOpened()):
     ret,cv2_im = cap.read()
@@ -71,8 +72,10 @@ while(cap.isOpened()):
         for w in range(im.width):
             lay=[]
             for h in range(im.height):
-                color=0#white
-                if im.getpixel((w,h)) > 128*3: color=1#black
+                c=sum(im.getpixel((w,h)) > 128*3)
+                if c>60*3 and c<190*3: color=1#gray
+                elif c<190*3:color=2#black
+                else:color=0#white
                 lay.append(color)
             pxArray.append(lay)
         skip=[]
