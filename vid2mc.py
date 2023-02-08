@@ -54,8 +54,6 @@ def fill_scale(array,pos,color):
             maxMatchH=yoff
     return (pos[0],maxMatchW),(pos[1],maxMatchH),skippo
 
-
-print('Read file: {}'.format(videoFile))
 cap = cv2.VideoCapture(videoFile) # says we capture an image from a webcam
 width  = math.floor(cap.get(3))
 height = math.floor(cap.get(4))
@@ -88,3 +86,7 @@ while(cap.isOpened()):
                     mcfunctionContent.append(cmdPreset["cmd"].format(x=x,y=y,y2=y+1,z=z+2,x1=d1[0],z1=d1[0],x2=d2[0],z2=d2[0]),block=blocks[color])
                     skip.extend(skipext)
                     x+=1;z+=2
+    else:break
+
+with open(mcfunctionFile,'w') as w:
+    w.write('\n'.join(mcfunctionContent))
