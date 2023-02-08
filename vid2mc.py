@@ -1,4 +1,5 @@
 #objective: create a 60fps original resolution recreation of "Bad Apple" in Minecraft in any way
+#execute store result score @p dash run data get entity @e[tag=topleft] Pos
 import math,cv2
 from PIL import Image
 from copy import deepcopy
@@ -7,24 +8,24 @@ videoFile='./crop/out00.mp4'
 mcfunctionFile='./datapacks/data/apple/functions/place.mcfunction'
 
 mcfunctionContent=[
-    'execute at @e[tag=topleft] run summon armor_stand ~ ~-6 ~-200 {{Tags:["cb"]}}',
+    'execute at @e[tag=topleft] run summon armor_stand ~ ~-6 ~150 {{Tags:["cb"]}}',
     "execute at @e[tag=cb] run setblock ~ ~-1 ~ barrier replace"
 ]
 cmdPreset:Dict[str,str|List[str]]={
     "cmd":'\n'.join([
-        "execute at @e[tag=cb] run setblock ~-{x} ~{y} ~{z} command_block replace",
-        "data modify block  ~-{x} ~{y} ~-{z} Command set value 'execute at @e[tag=topleft] run fill ~-{x1} ~2 ~-{z1} ~-{x2} ~2 ~-{z2} {block}'",
-        "execute at @e[tag=cb] run setblock ~-{x} ~{y2} ~{z} redstone_wire[east=side,west=side,south=side] replace"]),
+        "execute at @e[tag=cb] align xyz run setblock ~-{x} ~{y} ~{z} command_block replace",
+        "execute at @e[tag=cb] align xyz run data modify block  ~-{x} ~{y} ~-{z} Command set value 'execute at @e[tag=topleft] run fill ~-{x1} ~2 ~-{z1} ~-{x2} ~2 ~-{z2} {block}'",
+        "execute at @e[tag=cb] align xyz run setblock ~-{x} ~{y2} ~{z} redstone_wire[east=side,west=side,south=side] replace"]),
     "next":'\n'.join([
-        "execute at @e[tag=cb] run setblock ~ ~{y1} ~-{z1} repeater[facing={facing}] replace",
-        "execute at @e[tag=cb] run setblock ~ ~{y2} ~-{z2} barrier replace",
-        "execute @e[tag=cb] run setblock ~ ~{y1} ~-{z1} redstone_wire[east=up,west=up] replace"]),
+        "execute at @e[tag=cb] align xyz run setblock ~ ~{y1} ~-{z1} repeater[facing={facing},delay={delay}] replace",
+        "execute at @e[tag=cb] align xyz run setblock ~ ~{y2} ~-{z2} barrier replace",
+        "execute at @e[tag=cb] align xyz run setblock ~ ~{y1} ~-{z1} redstone_wire[east=up,west=up] replace"]),
     #thay x,z mỗi lần dùng
     "moveLayer":[
-        "execute at @e[tag=cb] run setblock ~-{x} ~{y} ~-{z} redstone_wire[{we}=up,south=side] replace\nexecute at @e[tag=cb] run setblock ~-{x} ~{y2} ~-{z} barrier replace",
-        "execute at @e[tag=cb] run setblock ~-{x} ~{y} ~-{z} redstone_wire[south=up,{we}=side] replace\nexecute at @e[tag=cb] run setblock ~-{x} ~{y2} ~-{z} barrier replace",
-        "execute at @e[tag=cb] run setblock ~-{x} ~{y} ~-{z} redstone_wire[{we}=up,south=side] replace\nexecute at @e[tag=cb] run setblock ~-{x} ~{y2} ~-{z} barrier replace",
-        "execute at @e[tag=cb] run setblock ~-{x} ~{y} ~-{z} redstone_wire[north=up,{we}=side] replace\nexecute at @e[tag=cb] run setblock ~-{x} ~{y2} ~-{z} barrier replace",
+        "execute at @e[tag=cb] align xyz run setblock ~-{x} ~{y2} ~-{z} barrier replace\nexecute at @e[tag=cb] align xyz run setblock ~-{x} ~{y} ~-{z} redstone_wire[{we}=up,south=side] replace\n",
+        "execute at @e[tag=cb] align xyz run setblock ~-{x} ~{y2} ~-{z} barrier replace\nexecute at @e[tag=cb] align xyz run setblock ~-{x} ~{y} ~-{z} redstone_wire[south=up,{we}=side] replace\n",
+        "execute at @e[tag=cb] align xyz run setblock ~-{x} ~{y2} ~-{z} barrier replace\nexecute at @e[tag=cb] align xyz run setblock ~-{x} ~{y} ~-{z} redstone_wire[{we}=up,south=side] replace\n",
+        "execute at @e[tag=cb] align xyz run setblock ~-{x} ~{y2} ~-{z} barrier replace\nexecute at @e[tag=cb] align xyz run setblock ~-{x} ~{y} ~-{z} redstone_wire[north=up,{we}=side] replace\n",
     ]
 }
 x,y,z=0,0,0
@@ -59,6 +60,7 @@ width  = math.floor(cap.get(3))
 height = math.floor(cap.get(4))
 blocks=['white_wool','gray_wool','black_wool']
 last_pxArray=[]
+repeatedFrames=1
 while(cap.isOpened()):
     ret,cv2_im = cap.read()
     if ret :
@@ -78,14 +80,21 @@ while(cap.isOpened()):
             pxArray.append(lay)
         skip=[]
         z+=1;x=0
-        mcfunctionContent.append(cmdPreset["next"].format(z1=x,z2=z+1,y1=y,y2=y+1,facing='east' if direction==0 else 'west'))
+        if repeatedFrames==4:
+            mcfunctionContent.append(cmdPreset["next"].format(z1=z,z2=z+1,y1=y-1,y2=y,facing='east' if direction==0 else 'west',delay=4))
+            mcfunctionContent.append("execute at @e[tag=cb] run setblock ~ ~{y2} ~-{z2} barrier replace\nexecute at @e[tag=cb] run setblock ~ ~{y1} ~-{z1} redstone_wire[east=side,west=side] replace".format(z1=z+1,z2=z+2,y1=y-1,y2=y))
+            z+=2
+            repeatedFrames=1
         for w,pw in enumerate(pxArray):
             for h,ph in enumerate(pw):
                 if ph != last_pxArray[w][h] and (w,h) not in skip:
+                    mcfunctionContent.append(cmdPreset["next"].format(z1=x,z2=z+1,y1=y,y2=y+1,facing='east' if direction==0 else 'west',delay=repeatedFrames))
                     d1,d2,skipext=fill_scale(pxArray,(w,h),ph)
                     mcfunctionContent.append(cmdPreset["cmd"].format(x=x,y=y,y2=y+1,z=z+2,x1=d1[0],z1=d1[0],x2=d2[0],z2=d2[0]),block=blocks[color])
                     skip.extend(skipext)
                     x+=1;z+=2
+                elif last_pxArray==pxArray:repeatedFrames+=1
+        last_pxArray=deepcopy(pxArray)
     else:break
 
 with open(mcfunctionFile,'w') as w:
