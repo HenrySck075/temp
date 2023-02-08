@@ -7,7 +7,7 @@ videoFile='./crop/out00.mp4'
 mcfunctionFile='./datapacks/data/apple/functions/place.mcfunction'
 
 mcfunctionContent=[
-    'execute at @e[tag=topleft] run summon armor_stand ~ ~-6 ~ {{Tags:["cb"]}}',
+    'execute at @e[tag=topleft] run summon armor_stand ~ ~-6 ~-200 {{Tags:["cb"]}}',
     "execute at @e[tag=cb] run setblock ~ ~-1 ~ barrier replace"
 ]
 cmdPreset:Dict[str,str|List[str]]={
@@ -38,6 +38,7 @@ def fill_scale(array,pos,color):
     skippo=[]
     for h in range(pos[1],maxHeight):
         if array[pos[0]][h+yoff]==color:
+            xoff=0
             for w in range(pos[0],maxWidth):
                 if array[w+xoff][h+yoff]==color:
                     skippo.append((w+xoff,h+yoff))
@@ -81,5 +82,5 @@ while(cap.isOpened()):
             for h,ph in enumerate(pw):
                 if ph != last_pxArray[w][h] and (w,h) not in skip:
                     d1,d2,skipext=fill_scale(pxArray,(w,h),ph)
-                    mcfunctionContent.append(cmdPreset["cmd"].format(x=x,y=y,y2=y+1,z=z,x1=d1[0],z1=d1[0],x2=d2[0],z2=d2[0]),block=blocks[color])
+                    mcfunctionContent.append(cmdPreset["cmd"].format(x=x,y=y,y2=y+1,z=z+2,x1=d1[0],z1=d1[0],x2=d2[0],z2=d2[0]),block=blocks[color])
                     skip.extend(skipext)
