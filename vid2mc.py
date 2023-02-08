@@ -16,9 +16,9 @@ cmdPreset:Dict[str,str|List[str]]={
         "data modify block  ~-{x} ~{y} ~-{z} Command set value 'execute at @e[tag=topleft] run fill ~-{x1} ~2 ~-{z1} ~-{x2} ~2 ~-{z2} {block}'",
         "execute at @e[tag=cb] run setblock ~-{x} ~{y2} ~{z} redstone_wire replace"]),
     "next":'\n'.join([
-        "execute at @e[tag=cb] run setblock ~-{x1} ~{y1} ~ repeater[facing={facing}] replace",
-        "execute at @e[tag=cb] run setblock ~-{x2} ~{y2} ~ barrier replace",
-        "execute @e[tag=cb] run setblock ~-{x2} ~{y1} ~ redstone_wire replace"]),
+        "execute at @e[tag=cb] run setblock ~ ~{y1} ~-{z1} repeater[facing={facing}] replace",
+        "execute at @e[tag=cb] run setblock ~ ~{y2} ~-{z2} barrier replace",
+        "execute @e[tag=cb] run setblock ~ ~{y1} ~-{z1} redstone_wire replace"]),
     #thay x,z mỗi lần dùng
     "moveLayer":[
         "execute at @e[tag=cb] run setblock ~-{x} ~{y} ~-{z} redstone_wire[{we}=up,south=side] replace\nexecute at @e[tag=cb] run setblock ~-{x} ~{y2} ~-{z} barrier replace",
@@ -80,7 +80,7 @@ while(cap.isOpened()):
             pxArray.append(lay)
         skip=[]
         x+=1
-        mcfunctionContent.append(cmdPreset["next"].format(x1=x,x2=x+1,y1=y,y2=y+1,facing='east' if direction==0 else 'west'))
+        mcfunctionContent.append(cmdPreset["next"].format(z1=x,z2=z+1,y1=y,y2=y+1,facing='east' if direction==0 else 'west'))
         for w,pw in enumerate(pxArray):
             for h,ph in enumerate(pw):
                 if ph != last_pxArray[w][h] and (w,h) not in skip:
