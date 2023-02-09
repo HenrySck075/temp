@@ -8,7 +8,7 @@ videoFile='./crop/out00.mp4'
 mcfunctionFile='./datapacks/data/apple/functions/place.mcfunction'
 
 mcfunctionContent=[
-    'execute at @e[tag=topleft] run summon armor_stand ~ ~-6 ~150 {{Tags:["cb"]}}',
+    'execute at @e[tag=topleft] run summon armor_stand ~ ~-6 150 {{Tags:["cb"]}}',
     "execute at @e[tag=cb] run setblock ~ ~-1 ~ barrier replace"
 ]
 cmdPreset:Dict[str,str|List[str]]={
@@ -28,7 +28,7 @@ cmdPreset:Dict[str,str|List[str]]={
         "execute at @e[tag=cb] align xyz run setblock ~-{x} ~{y2} ~-{z} barrier replace\nexecute at @e[tag=cb] align xyz run setblock ~-{x} ~{y} ~-{z} redstone_wire[north=up,{we}=side] replace\n",
     ]
 }
-x,y,z=0,0,0
+x,y,z=0,0,-150
 direction=0#right, 1 for left
 def fill_scale(array,pos,color):
     "pxArray, pixel pos, color (0,1)"
@@ -55,6 +55,10 @@ def fill_scale(array,pos,color):
             maxMatchH=yoff
     return (pos[0],maxMatchW),(pos[1],maxMatchH),skippo
 
+def moveLayer(pos:List[tuple],side:str):
+    for i in range(4):
+        po=pos[i]
+        mcfunctionContent.append(cmdPreset["moveLayer"][i].format(x=x+po[0],y=y+po[1],y2=y+po[1]+1,z=z+po[2],we=side))
 cap = cv2.VideoCapture(videoFile) # says we capture an image from a webcam
 width  = math.floor(cap.get(3))
 height = math.floor(cap.get(4))
@@ -94,9 +98,8 @@ while(cap.isOpened()):
                     skip.extend(skipext)
                     x+=1;z+=2
                 elif last_pxArray==pxArray:repeatedFrames+=1
-        if z==300:
-            for i in range(4):
-                mcfunctionContent.append(cmdPreset["moveLayer"][i].format(z=z+1,we='east'))
+        if z>=150:
+            mobeLayer([(0,0,1),(1,-1,2),(1,-2,3),(0,-3,3)],'east')
         last_pxArray=deepcopy(pxArray)
     else:break
 
