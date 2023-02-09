@@ -94,6 +94,9 @@ while(cap.isOpened()):
                     skip.extend(skipext)
                     x+=1;z+=2
                 elif last_pxArray==pxArray:repeatedFrames+=1
+        if z==300:
+            for i in range(4):
+                mcfunctionContent.append(cmdPreset["moveLayer"][i].format(z=z+1,we='east'))
         last_pxArray=deepcopy(pxArray)
     else:break
 
