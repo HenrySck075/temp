@@ -26,7 +26,8 @@ cmdPreset:Dict[str,str|List[str]]={
         "execute at @e[tag=cb] align xyz run setblock ~-{x} ~{y2} ~-{z} barrier replace\nexecute at @e[tag=cb] align xyz run setblock ~-{x} ~{y} ~-{z} redstone_wire[south=up,{we}=side] replace\n",
         "execute at @e[tag=cb] align xyz run setblock ~-{x} ~{y2} ~-{z} barrier replace\nexecute at @e[tag=cb] align xyz run setblock ~-{x} ~{y} ~-{z} redstone_wire[{we}=up,south=side] replace\n",
         "execute at @e[tag=cb] align xyz run setblock ~-{x} ~{y2} ~-{z} barrier replace\nexecute at @e[tag=cb] align xyz run setblock ~-{x} ~{y} ~-{z} redstone_wire[north=up,{we}=side] replace\n",
-    ]
+    ],
+    "monika": "execute at @e[tag=cb] run setblock ~ ~{y2} ~-{z2} barrier replace\nexecute at @e[tag=cb] run setblock ~ ~{y1} ~-{z1} redstone_wire[east=side,west=side] replace"
 }
 x,y,z=0,0,-150
 direction=0#right, 1 for left
@@ -86,7 +87,7 @@ while(cap.isOpened()):
         z+=1;x=0
         if repeatedFrames==4:
             mcfunctionContent.append(cmdPreset["next"].format(z1=z,z2=z+1,y1=y-1,y2=y,facing='east' if direction==0 else 'west',delay=4))
-            mcfunctionContent.append("execute at @e[tag=cb] run setblock ~ ~{y2} ~-{z2} barrier replace\nexecute at @e[tag=cb] run setblock ~ ~{y1} ~-{z1} redstone_wire[east=side,west=side] replace".format(z1=z+1,z2=z+2,y1=y-1,y2=y))
+            mcfunctionContent.append(cmdPreset["monika"].format(z1=z+1,z2=z+2,y1=y-1,y2=y))
             z+=2
             repeatedFrames=1
         for w,pw in enumerate(pxArray):
@@ -99,7 +100,9 @@ while(cap.isOpened()):
                     x+=1;z+=2
                 elif last_pxArray==pxArray:repeatedFrames+=1
         if z>=150:
-            mobeLayer([(0,0,1),(1,-1,2),(1,-2,3),(0,-3,3)],'east')
+            moveLayer([(0,0,1),(1,-1,2),(1,-2,3),(0,-3,3)],'east')
+            y-=3
+            mcfunctionContent.append(cmdPreset["monika"])
         last_pxArray=deepcopy(pxArray)
     else:break
 
