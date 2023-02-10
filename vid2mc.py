@@ -82,7 +82,7 @@ try:
                         if (ph != last_pxArray[w][h]) and (w,h) not in skip:
                             repeatedFrames=1
                             d1,d2,skipext=fill_scale(pxArray,(w,h),ph)
-                            animFrame.append(f'execute at @e[tag=topleft] align xyz run fill ~-{w} ~2 ~-{h} ~-{d1} ~2 ~-{d2} {blocks[ph]}')
+                            animFrame.append(f'execute at @e[tag=topleft] align xyz run fill ~-{w} ~2 ~-{h} ~-{d1} ~2 ~-{d2} {blocks[ph]}\nscoreboard players set frame frames 1')
                             skip.extend(skipext)
                 if last_pxArray==pxArray:repeatedFrames+=1
                 last_pxArray=deepcopy(pxArray)
@@ -95,7 +95,7 @@ try:
                         case 2: x+=1
                         case 3: z+=1
                     print(x,z)
-                    mcfunctionContent.append("\nexecute at @e[tag=topleft] align xyz run setblock ~{0} ~-2 ~{1} chain_command_block\nexecute at @e[tag=topleft] align xyz run data modify block ~{0} ~-2 ~{1} Command set value 'execute if score frame frames matches {3} run function appleanim:frame{2}'".format(x,z,updatedFrames,frames-repeatedFrames))
+                    mcfunctionContent.append("\nexecute at @e[tag=topleft] align xyz run setblock ~{0} ~-2 ~{1} chain_command_block\nexecute at @e[tag=topleft] align xyz run data modify block ~{0} ~-2 ~{1} Command set value 'execute if score frame frames matches {3} run function appleanim:frame{2}'".format(x,z,updatedFrames,repeatedFrames))
                     updatedFrames+=1
             frames+=1
         else:break
