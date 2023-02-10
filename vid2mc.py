@@ -70,8 +70,8 @@ try:
                     lay=[]
                     for h in range(im.height):
                         c=sum(im.getpixel((w,h)))
-                        if c>(60*3) and c<(190*3): color=1#gray
-                        elif c<(190*3):color=2#black
+                        if c>(80*3) and c<(190*3): color=1#gray
+                        elif c>(80*3):color=2#black
                         else:color=0#white
                         lay.append(color)
                     pxArray.append(lay)
