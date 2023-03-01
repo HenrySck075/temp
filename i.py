@@ -26,10 +26,19 @@ downpath="C:/Users/HenryS/Desktop/Misc. content/pixiv_restored"
 print("enter loop")
 for i in os.listdir(epicpath):
     if "SPOILER_" in i:continue #i dont want to
-    if (r:=re.search(" (.*)_p0_(.*)1200" if i.count('_') == 3 else " (.*)_p0",i))!=None:
+    if (r:=re.search(" (.*)_p0",i))!=None:
         imgid=r.group(0)
         head={"x-user-id":76179633,"referer":f"https://www.pixiv.net/en/artworks/{imgid}"}
         resp=requests.get(f'https://www.pixiv.net/ajax/illust/{imgid}?ref=https%3A%2F%2Fwww.pixiv.net%2F&lang=en&version=a396fb43977c854f88d11c71cd0fbac4d20d42d8').json()
         if not resp['error']:
+            #using the case where there's only 1 image in
+            #ab artwork
+            #please change this
+            url=resp["body"]["urls"]["original"].replace("\\","/")
+            img=requests.get(url)
+            with open(os.path.join(downpath,url.split('/')[-1])) as w:
+                w.write(img)
+            
+
         input(" ")
         #illust.download(downpath,filename=f"{imgid}_p0")
